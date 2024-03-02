@@ -1,5 +1,8 @@
+import { FilesTable } from "@/components/archivos/FilesTable"
+import { getFiles } from "@/lib/data"
 
-function FilesPage() {
-  return <h1>FilesPage</h1>
+async function FilesPage() {
+  const files = await getFiles()
+  return <h1><FilesTable files={files} /></h1>
 }
 export default FilesPage 

@@ -3,9 +3,10 @@
 import axios from "axios";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { FORM_API, LOCAL_URL, UBIS_API } from "./db";
+import db, { FILE_API, FORM_API, LOCAL_URL, UBIS_API } from "./db";
 import { formSchema } from "./validations";
 import { ZodError } from "zod";
+import { formData } from "zod-form-data";
 
 export const addForm = async (formData: FormData): Promise<void> => {
   try {
@@ -68,6 +69,26 @@ export const EditUbi = async (ubiId: any, Descripcion: string) => {
   }
   revalidatePath("/ubicaciones")
   redirect("/ubicaciones")
+}
+export const createfile = async (fileInfo: any) => {
+
+  try {
+    await db.client.collection('Archivos').create(fileInfo);
+  } catch (error) {
+    console.error('error al crear el archivo', error);
+    throw error; // propaga el error para manejarlo en el componente si es necesario
+  }
+};
+export const deleteFile = async (fileId: string) => {
+  try {
+    await db.client.collection('Archivos').delete(fileId)
+    revalidatePath('/Archivos')
+
+  } catch (error) {
+    console.error('error al eliminar archivo', error)
+    throw error
+
+  }
 }
 
 export type State =

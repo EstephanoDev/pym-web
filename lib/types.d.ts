@@ -76,3 +76,19 @@ export interface GetFormResponse {
   totalPages: number;
   items: Formularios[];
 }
+type File = {
+  id: string;
+  collectionId: string;
+  collectionName: string;
+  created: string; // Formato: '2022-01-01 01:00:00.123Z'
+  updated: string; // Formato: '2022-01-01 23:59:59.456Z'
+  File: string; // Ahora es un solo string en lugar de un array de strings
+  name: string;
+  carpeta: string;
+};
+
+type FilesTableProps = {
+  files: File[];
+};
+
+

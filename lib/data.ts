@@ -1,11 +1,15 @@
 import axios from "axios";
-import db, { GETUSER_API, LOCAL_URL, UBIS_API, WEEK_API, FORM_API } from "./db"
+import db, { GETUSER_API, LOCAL_URL, UBIS_API, WEEK_API, FORM_API, FILE_API } from "./db"
 import { Formularios, GetFormResponse, GetRolResponse, WeekForms } from "./types"
 
 async function getRolById(userId: string): Promise<GetRolResponse> {
   const rol: GetRolResponse = await db.client.collection('users').getList(1, 2, {
     filter: `id = '${userId}'`
   });
+  return rol;  // Return the entire object, not just rol.items
+}
+export async function getRol() {
+  const rol = await db.client.collection('roles').getFullList()
   return rol;  // Return the entire object, not just rol.items
 }
 export async function getData() {
@@ -16,6 +20,7 @@ export async function getAllForms(): Promise<Formularios[]> {
   const forms = await axios.get(`${LOCAL_URL}/${FORM_API}`)
   return forms.data.items
 }
+
 
 export async function getFormsById(userId: string, search: string): Promise<Formularios[]> {
   db.client.autoCancellation(false)
@@ -99,5 +104,9 @@ const fetchUserNames = async (grupoIds: string[]) => {
 export const fetchForm = async (id: string) => {
   const records = await db.client.collection('Formulario').getOne(id)
   return records
+}
+export const getFiles = async () => {
+  const records = await axios.get(`${LOCAL_URL}/${FILE_API}`)
+  return records.data
 }
 

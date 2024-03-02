@@ -35,34 +35,49 @@ function LoginPage() {
   };
 
   return (
-    <div>
-      <h1>Login</h1>
+    <div className="flex items-center justify-center min-h-screen">
+      <img src="./logo.jpeg" alt="Logo" className="w-32 mb-8" />
 
-      <form onSubmit={onSubmit}>
-        <div className='text-black'>
-          <label htmlFor="email">Email</label>
-          <input
-            type="text"
-            id="email"
-            value={email}
-            onChange={e => setEmail(e.target.value || '')}
-          />
-        </div>
+      <div className="bg-white p-8 rounded shadow-md w-72">
+        <h1 className="text-2xl font-bold mb-4">Login</h1>
 
-        <div>
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={e => setPassword(e.target.value || '')}
-          />
-        </div>
+        <form onSubmit={onSubmit}>
+          <div className="mb-4">
+            <label htmlFor="email" className="block mb-1 font-semibold text-gray-700">
+              Email
+            </label>
+            <input
+              type="text"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value || '')}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+          </div>
 
-        <button type="submit">Login</button>
+          <div className="mb-4">
+            <label htmlFor="password" className="block mb-1 font-semibold text-gray-700">
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value || '')}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+          </div>
 
-        {error && <p className='error'>{error}</p>}
-      </form>
+          <button
+            type="submit"
+            className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-700 transition duration-300"
+          >
+            Login
+          </button>
+
+          {error && <p className="text-red-500 mt-4">{error}</p>}
+        </form>
+      </div>
     </div>
   )
 }
