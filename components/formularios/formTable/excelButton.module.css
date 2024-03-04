@@ -1,0 +1,22 @@
+.excelButtonContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.excelButton {
+  background-color: #3498db;
+  color: #fff;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+
+}
+
+/* Add responsive styles as needed */
+@media only screen and (max-width: 600px) {
+  /* Add responsive styles for smaller screens */
+}
+

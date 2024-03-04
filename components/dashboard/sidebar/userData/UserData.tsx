@@ -5,9 +5,19 @@ import { RiLogoutBoxLine } from 'react-icons/ri';  // Importa el ícono de logou
 import styles from "../sidebar.module.css";
 import { Avatar } from "@/components/ui/avatar";
 import { AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import { destroyCookie } from 'nookies'
+import { useRouter } from 'next/navigation'
+
 
 export const UserData = ({ rol, username, avatar }: { rol: string, username: string, avatar: string }) => {
   const usernameFormat = username.slice(0, 2).toUpperCase()
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    destroyCookie(null, 'pb_auth');  // Reemplaza 'tu_cookie_de_autenticacion' con el nombre de tu cookie
+    router.refresh()
+
+  }
   return (
     <>
       <Avatar>
@@ -21,7 +31,7 @@ export const UserData = ({ rol, username, avatar }: { rol: string, username: str
         </span>
       </div>
       <div className={styles.userActions}>
-        <RiLogoutBoxLine className={styles.logoutIcon} />
+        <RiLogoutBoxLine className={styles.logoutIcon} onClick={handleLogout} />
         <ModeToggle />
       </div>
     </>

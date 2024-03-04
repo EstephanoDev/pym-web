@@ -1,79 +1,72 @@
-"use client";
+'use client'
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { formSchemaClient } from "@/lib/validations";
-import { FORM_API, LOCAL_URL, pb } from "@/lib/db";
-import axios from "axios";
+import { useEffect, useState } from 'react'
+import Select from 'react-select'
+import { createForm } from "./formAction";
 
-const inputClasses =
-  "text-black block border-0 rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 border-gray-400 w-full";
-const buttonClasses =
-  "rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 disabled:bg-gray-400 disabled:text-gray-300 disabled:cursor-not-allowed";
+interface User {
+  id: string; // Adjust the type based on the actual type of the user ID
+  value: string;
+}
+function FormContent({ users, client }: any) {
+  const [selectedUsers, setSelectedUsers] = useState<User[]>([]); 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredOptions, setFilteredOptions] = useState([]);
 
-const selectClasses =
-  "rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 disabled:bg-gray-400 disabled:text-gray-300 disabled:cursor-not-allowed";
-
-
-
-function FormContent() {
-  const clientAction = async (formData: FormData) => {
-    const ubicacionFormatted = formData.get('Ubicacion') + '-' + formData.get('Ubicacion2') + '-' + formData.get('Ubicacion3')
-    const fecha: any = formData.get('Fecha')
-    const fechaObjeto = new Date(fecha);
-    const fechaFormateada = `${fechaObjeto.getFullYear()}-${(fechaObjeto.getMonth() + 1).toString().padStart(2, '0')}-${fechaObjeto.getDate().toString().padStart(2, '0')} 12:00:00`;
-
-
-    if (formData.get('TipoTrabajo') == 'BOTH') {
-      const newForm = {
-        Fecha: fechaFormateada,
-        Trabajador: formData.get('Trabajador'),
-        Grupo: [formData.get('Grupo'), formData.get('Trabajador')],
-        TipoTrabajo: 'INSTALACIONES',
-        TrabajoRealizado: formData.get('TrabajoRealizado'),
-        Ubicacion: ubicacionFormatted,
-        Observacion: formData.get('Observacion'),
-      }
-      const newForm2 = {
-        Fecha: fechaFormateada,
-        Trabajador: [formData.get('Grupo'), formData.get('Trabajador')],
-        Grupo: formData.get('Grupo'),
-        TipoTrabajo: 'ACTIVACIONES',
-        TrabajoRealizado: formData.get('TrabajoRealizado'),
-        Ubicacion: ubicacionFormatted,
-        Observacion: formData.get('Observacion'),
-      }
-      const result = formSchemaClient.safeParse(newForm)
-      if (!result.success) {
-        console.log(result)
-      }
-      await axios.post(`${LOCAL_URL}/${FORM_API}`, newForm)
-      await axios.post(`${LOCAL_URL}/${FORM_API}`, newForm2)
-      return
+  useEffect(() => {
+    // Filtrar opciones solo cuando la longitud de la búsqueda es al menos 3
+    if (searchQuery.length >= 3) {
+      const filtered = users.filter(
+        (user: any) =>
+          user.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredOptions(
+        filtered.map((user: any) => ({
+          value: user.id,
+          label: user.name,
+        }))
+      );
     }
-    const newForm = {
-      Fecha: fechaFormateada,
-      Trabajador: [formData.get('Grupo'), formData.get('Trabajador')],
-      Grupo: formData.get('Grupo'),
-      TipoTrabajo: formData.get('TipoTrabajo'),
-      TrabajoRealizado: formData.get('TrabajoRealizado'),
-      Ubicacion: ubicacionFormatted,
-      Observacion: formData.get('Observacion'),
-    }
-    const result = formSchemaClient.safeParse(newForm)
-    if (!result.success) {
-      console.log(result)
-    }
-    await axios.post(`${LOCAL_URL}/${FORM_API}`, newForm)
-  }
+  }, [searchQuery, users]);
+
+  const handleSelectChange = (selectedOptions: any) => {
+    setSelectedUsers(selectedOptions);
+  };
+
+  const handleInputChange = (inputValue: string) => {
+    setSearchQuery(inputValue);
+  };
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+  
+    // Extract values from selectedUsers array and add them to the form data
+    const selectedValues = selectedUsers.map((user) => user.value);
+    const formData = new FormData(event.currentTarget);
+    formData.append('selectedUsers', JSON.stringify(selectedValues));
+  
+    // Call createForm with formData
+    createForm(formData);
+  };
+  
 
   return (
     <div className="grid grid-cols-1 gap-3 relative">
-      <form action={clientAction}>
-        <Input type="date" className={inputClasses} name="Fecha" />
-        <Input type="text" value='6ibspqnkozxup3p' readOnly hidden name="Trabajador" />
-        <Input type="text" className={inputClasses} name="Grupo" placeholder="Grupo" />
-        <select className={selectClasses} name="TipoTrabajo">
+      <form onSubmit={handleSubmit}>
+        <Input type="date" name="Fecha" />
+        <input type="text" value={client.id} readOnly hidden name="Trabajador" />
+        <Select
+          className="text-black"
+          isMulti
+          name="Grupo"
+          options={filteredOptions}
+          value={selectedUsers}
+          onChange={handleSelectChange} // Handle Select change
+          onInputChange={handleInputChange} // Handle input change
+        />
+        <select  name="TipoTrabajo">
           <option value='RD'>RD</option>
           <option value='RA'>RA</option>
           <option value='DP'>DP</option>
@@ -86,16 +79,16 @@ function FormContent() {
           <option value='AVERIAS'>AVERIAS</option>
           <option value='OTROS'>OTROS</option>
         </select>
-        <Input className={inputClasses} name="TrabajoRealizado" placeholder="TrabajoRealizado" />
+        <Input name="TrabajoRealizado" type="number" placeholder="TrabajoRealizado" />
         <div className="flex flex-auto">
-          <Input className={inputClasses} name="Ubicacion" placeholder="xxx" />
+          <Input name="Ubicacion" placeholder="xxx" />
           <h1 className="m-2">-</h1>
-          <Input className={inputClasses} name="Ubicacion2" placeholder="xxx" />
+          <Input name="Ubicacion2" placeholder="xxx" />
           <h1 className="m-2">-</h1>
-          <Input className={inputClasses} name="Ubicacion3" placeholder="xxxxx" />
+          <Input name="Ubicacion3" placeholder="xxxxx" />
         </div>
-        <Input className={inputClasses} name="Observacion" placeholder="Observacion" />
-        <Button className={buttonClasses} type="submit">Submit</Button>
+        <Input name="Observacion" placeholder="Observacion" />
+        <Button type="submit">Submit</Button>
       </form>
     </div>
 
